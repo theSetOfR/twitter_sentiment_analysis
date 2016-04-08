@@ -74,7 +74,7 @@ def totwo(s):
     return pattern.sub(r"\1\1", s)
 
 
-"""add negation to tweets"""
+"""add negation to tweetss"""
 
 
 def replaceNegationBi(tweet):
