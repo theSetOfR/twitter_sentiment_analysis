@@ -60,9 +60,11 @@ def scorelexicon(tweet, dictionary):
             maxscore.append(sent)
             lastscore = sent
     if maxscore != []:
-        return [count, score, biggestscore(max(maxscore), min(maxscore)), lastscore]
+        # return [count, score, biggestscore(max(maxscore), min(maxscore)), lastscore]
+        return [count, biggestscore(max(maxscore), min(maxscore)), lastscore]
     else:
-        return [count, score, 0.0, lastscore]
+        #return [count, score, 0.0, lastscore]
+        return [count, 0.0, lastscore]
 
 
 """Replace with letter reptitions from more than 2 to 2"""
@@ -309,21 +311,21 @@ def getSVMFeatureVectorAndLabels(tweets, featureList, dictionary1, dictionary2):
         tweet_opinion = t[2]
         tweet_n_grams = t[3]
         # Fill the map
-        # for word in tweet_words:
-        #     # process the word (remove repetitions and punctuations)
-        #     # word = replaceTwoOrMore(word)
-        #     # word = word.strip('\'"?,.')
-        #     # set map[word] to 1 if word exists
-        #     if word in map:
-        #         map[word] = 1
-        # # end for loop
-        # values = map.values()
+        for word in tweet_words:
+            # process the word (remove repetitions and punctuations)
+            # word = replaceTwoOrMore(word)
+            # word = word.strip('\'"?,.')
+            # set map[word] to 1 if word exists
+            if word in map:
+                map[word] = 1
+        # end for loop
+        values = map.values()
 
         # Get the lexicon values
         # print scorelexicon(tweet_words)
-        values = scorelexicon(tweet_words, dictionary1)
-        values.extend(scorelexicon(tweet_words, dictionary2))
-        # values.extend(countPOS(tweet_token))
+        values.extend(scorelexicon(tweet_words, dictionary1))
+        values.extend(scorelexicon(tweet_n_grams, dictionary2))
+        values.extend(countPOS(tweet_token))
 
         feature_vector.append(values)
         # need to add more things here
