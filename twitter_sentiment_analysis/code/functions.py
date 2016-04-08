@@ -139,20 +139,24 @@ def countPOS(pos):
 
 
 # start getfeatureVector
-def getFeatureVector(tweet, stopWords):
-    tweetP = preprocess(tweet)
+def get_unigrams(tweet, stopWords, process):
+    if process ==1:
+        tweetP = preprocess(tweet)
+    else:
+        tweetP = tweet
     featureVector = []
     # split tweet into words
     words = tweetP.split()
     for w in words:
-        # replace two or more with two occurrences
-        w = totwo(w)
-        # strip punctuation
-        w = w.strip('\'"?,.:;')
-        # check if the word starts with an alphabet
+        if process ==1:
+            # replace two or more with two occurrences
+            w = totwo(w)
+            # strip punctuation
+            w = w.strip('\'"?,.:;')
+            # check if the word starts with an alphabet
         val = re.search(r"^[a-zA-Z][a-zA-Z0-9]*$", w)
-        # ignore if it is a stop word
-        if (w in stopWords or val is None):
+            # ignore if it is a stop word
+        if (w in stopWords or val is None and process==1):
             continue
         else:
             featureVector.append(w.lower())
@@ -161,26 +165,29 @@ def getFeatureVector(tweet, stopWords):
     return featureVector
 
 
-# end
-
-def getBigrams(tweet, stopWords):
-    tweetP = preprocess(tweet)
+def getBigrams(tweet, stopWords, process):
+    if process == 1:
+        tweetP = preprocess(tweet)
+    else:
+        tweetP = tweet
     tweetB = ngrams(tweetP, 2)
     bigrams = []
     for i in range(len(tweetB)):
         w = tweetB[i][0]
-        w = totwo(w)
-        w = w.strip('\'"?,.')
+        if process == 1:
+            w = totwo(w)
+            w = w.strip('\'"?,.')
         w = w.lower()
         tweetB[i][0] = w
 
         w2 = tweetB[i][1]
-        w2 = totwo(w2)
-        w2 = w2.strip('\'"?,.:;')
+        if process == 1:
+            w2 = totwo(w2)
+            w2 = w2.strip('\'"?,.:;')
         w2 = w2.lower()
         tweetB[i][1] = w2
         # ignore if stop word
-        if tweetB[i][0] in stopWords and tweetB[i][1] in stopWords:
+        if tweetB[i][0] in stopWords and tweetB[i][1] in stopWords and process == 1:
             continue
         else:
             bigrams.append(' '.join(tweetB[i]))
@@ -266,14 +273,15 @@ def make_feature_vector(data, T):
     for i in range(len(data)):
         sentiment = data[i][2]
         token = data[i][1]
-        featureVector1 = getBigrams(data[i][0], stopWords)
+        featureVector1 = getBigrams(data[i][0], stopWords, 1)
         featureList.extend(featureVector1)
-        featureVector2 = getFeatureVector(data[i][0], stopWords)
+        featureVector2 = get_unigrams(data[i][0], stopWords, 1)
         featureList.extend(featureVector2)
         featureVector3 = getTrigrams(data[i][0], stopWords)
         featureList.extend(featureVector3)
+        n_grams = get_unigrams(data[i][0], stopWords, 0)+getBigrams(data[i][0], stopWords, 0)
         # remember to add +feature vector 3 below
-        vector.append((featureVector1 + featureVector2 + featureVector3, token, sentiment))
+        vector.append((featureVector1 + featureVector2 + featureVector3, token, sentiment, n_grams))
     if T == 1:
         return (featureList, vector)
     else:
@@ -283,7 +291,7 @@ def make_feature_vector(data, T):
 """Extract features"""
 
 
-def getSVMFeatureVectorAndLabels(tweets, featureList, dictionary):
+def getSVMFeatureVectorAndLabels(tweets, featureList, dictionary1, dictionary2):
     sortedFeatures = sorted(featureList)
 
     feature_vector = []
@@ -299,6 +307,7 @@ def getSVMFeatureVectorAndLabels(tweets, featureList, dictionary):
         tweet_words = t[0]
         tweet_token = t[1]
         tweet_opinion = t[2]
+        tweet_n_grams = t[3]
         # Fill the map
         # for word in tweet_words:
         #     # process the word (remove repetitions and punctuations)
@@ -312,7 +321,8 @@ def getSVMFeatureVectorAndLabels(tweets, featureList, dictionary):
 
         # Get the lexicon values
         # print scorelexicon(tweet_words)
-        values = scorelexicon(tweet_words, dictionary)
+        values = scorelexicon(tweet_words, dictionary1)
+        values.extend(scorelexicon(tweet_words, dictionary2))
         # values.extend(countPOS(tweet_token))
 
         feature_vector.append(values)

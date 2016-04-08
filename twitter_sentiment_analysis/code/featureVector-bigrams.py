@@ -320,14 +320,23 @@ dataT = read_data("../data/tweets/finalTestingInput.txt")
 
 #Build dictionaries
 dictionary={}
-with open("../data/other/NRC-Hashtag Lexicon/unigrams-pmilexicon copy.txt",'r') as f:
+with open("../data/other/sentiment 140 lexicon/unigrams-pmilexicon copy.txt",'r') as f:
     for i in f:
         el = i.split("\t")
         dictionary[el[0]] = el[1]
-with open("../data/other/NRC-Hashtag Lexicon/bigrams-pmilexicon copy.txt",'r') as f:
+with open("../data/other/sentiment 140 lexicon/bigrams-pmilexicon copy.txt",'r') as f:
     for i in f:
         el = i.split("\t")
         dictionary[el[0]] = el[1]
+dictionary2={}
+with open("../data/other/hashtag lexicon/unigrams-pmilexicon.txt",'r') as f:
+    for i in f:
+        el = i.split("\t")
+        dictionary2[el[0]] = el[1]
+with open("../data/other/hashtag lexicon/bigrams-pmilexicon.txt",'r') as f:
+    for i in f:
+        el = i.split("\t")
+        dictionary2[el[0]] = el[1]
 
 featureList, train_tweets= make_feature_vector(data,1)
 test_tweets = make_feature_vector(dataT,0)
@@ -338,7 +347,7 @@ featureList = list(set(featureList))
 startTime = datetime.now()
 
 print 'getting result'
-result = getSVMFeatureVectorAndLabels(train_tweets, featureList, dictionary)
+result = getSVMFeatureVectorAndLabels(train_tweets, featureList, dictionary, dictionary2)
 
 problem = svm_problem(result['labels'], result['feature_vector'])
 # '-q' option suppress console output
