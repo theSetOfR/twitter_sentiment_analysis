@@ -14,6 +14,8 @@ Twitter Sentiment Analysis
 
 
 A simple program to run sentiment analysis on Twitter using a support vector machine.
+This will make use of machine learning and lexicon techniques.
+This work is part of a FYP
 
 * Free software: ISC license
 * Documentation: https://twitter_sentiment_analysis.readthedocs.org.
