@@ -2,316 +2,6 @@ from functions import *
 from svmutil import *
 from datetime import datetime
 
-
-# # ########function to make n-grams########### - moved
-# def ngrams(input, n):
-#     input = input.split(' ')
-#     output = []
-#     for i in range(len(input) - n + 1):
-#         output.append(input[i:i + n])
-#     return output
-#
-# def processTweet(tweet):
-#     # process the tweets ----------- moved
-#
-#     #Convert to lower case
-#     tweet = tweet.lower()
-#     #Convert www.* or https?://* to URL
-#     tweet = re.sub('((www\.[^\s]+)|(https?://[^\s]+))','URL',tweet)
-#     #Convert @username to AT_USER
-#     tweet = re.sub('@[^\s]+','AT_USER',tweet)
-#     #Remove additional white spaces
-#     tweet = re.sub('[\s]+', ' ', tweet)
-#     #Replace #word with word
-#     tweet = re.sub(r'#([^\s]+)', r'\1', tweet)
-#     #trim
-#     tweet = tweet.strip('\'"')
-#     return tweet
-# #end
-#
-# #----------moved
-# def biggestNum(a,b):
-#     if abs(a)>abs(b):
-#         return a
-#     elif abs(a)<abs(b):
-#         return b
-#     else:
-#         return 0
-#
-# #-------moved
-# def lexiconScores(tweet):
-#     count = 0
-#     score = 0.0
-#     maxS = []
-#     lastS = 0.0
-#     for i in range(len(tweet)):
-#         if tweet[i] in dictionary:
-#             sent = float(dictionary[tweet[i]])
-#             count += 1
-#             score += sent
-#             maxS.append(sent)
-#             lastS = sent
-#     if maxS!=[]:
-#         return [count, score, biggestNum(max(maxS), min(maxS)), lastS]
-#     else:
-#         return [count, score, 0.0, lastS]
-#
-#
-#
-#
-# # start replaceTwoOrMore --------moved
-# def totwo(s):
-#     # look for 2 or more repetitions of character and replace with the character itself
-#     pattern = re.compile(r"(.)\1{1,}", re.DOTALL)
-#     return pattern.sub(r"\1\1", s)
-#
-#
-#
-# ##________________________________MOVED
-# def replaceNegationBi(tweet):
-#     for i in range(len(tweet)):
-#         word = tweet[i]
-#         if "no " in word or "not " in word or "n't" in word:
-#             tweet[i] += '_NEG'
-#
-#
-# def replaceNegationUni(tweet):
-#     for i in range(len(tweet)):
-#         word = tweet[i]
-#         if word == "no" or word == "not":
-#             if i < len(tweet) - 1:
-#                 tweet[i + 1] += '_NEG'
-#             else:
-#                 continue
-#         elif "n't" in word:
-#             tweet[i] += '_NEG'
-#
-# #Count POS tags MOVed
-# def countPOS(pos):
-#     PUNCT=N=V=PN=P=A=O=R=NUM=C=MEN=D=L=U=HASH=0
-#     for i in range(len(pos)):
-#         if pos[i]==',':
-#             PUNCT +=1
-#         elif pos[i]=='N':
-#             N+=1
-#         elif pos[i]=='V':
-#             V+=1
-#         elif pos[i]=='^':
-#             PN+=1
-#         elif pos[i]=='P':
-#             P+=1
-#         elif pos[i]=='A':
-#             A+=1
-#         elif pos[i]=='O':
-#             O+=1
-#         elif pos[i]=='R':
-#             R+=1
-#         elif pos[i]=='$':
-#             NUM+=1
-#         elif pos[i]=='&':
-#             C+=1
-#         elif pos[i]=='@':
-#             MEN+=1
-#         elif pos[i]=='D':
-#             D+=1
-#         elif pos[i]=='L':
-#             L+=1
-#         elif pos[i]=='U':
-#             U+=1
-#         elif pos[i]=='#':
-#             HASH+=1
-#     return [PUNCT,N,V,PN,P,A,O,R,NUM,C,MEN,D,L,U,HASH]
-#
-# # start getStopWordList
-# # initialize stopWords
-#
-# def getStopWordList(stopWordListFileName):
-#     # read the stopwords file and build a list
-#     stopWords = []
-#     stopWords.append('AT_USER')
-#     stopWords.append('URL')
-#
-#     fp = open(stopWordListFileName, 'r')
-#     line = fp.readline()
-#     while line:
-#         word = line.strip()
-#         stopWords.append(word)
-#         line = fp.readline()
-#     fp.close()
-#     return stopWords
-#
-#
-# # start getfeatureVector------moved
-# def getFeatureVector(tweet):
-#     tweetP = processTweet(tweet)
-#     featureVector = []
-#     # split tweet into words
-#     words = tweetP.split()
-#     for w in words:
-#         # replace two or more with two occurrences
-#         w = totwo(w)
-#         # strip punctuation
-#         w = w.strip('\'"?,.:;')
-#         # check if the word starts with an alphabet
-#         val = re.search(r"^[a-zA-Z][a-zA-Z0-9]*$", w)
-#         # ignore if it is a stop word
-#         if (w in stopWords or val is None):
-#             continue
-#         else:
-#             featureVector.append(w.lower())
-#          #replace negation
-#     #replaceNegationUni(featureVector)
-#     return featureVector
-#
-#
-# # end
-#
-# def getBigrams(tweet):
-#     tweetP = processTweet(tweet)
-#     tweetB = ngrams(tweetP, 2)
-#     bigrams = []
-#     for i in range(len(tweetB)):
-#         w = tweetB[i][0]
-#         w = totwo(w)
-#         w = w.strip('\'"?,.')
-#         w = w.lower()
-#         tweetB[i][0] = w
-#
-#         w2 = tweetB[i][1]
-#         w2 = totwo(w2)
-#         w2 = w2.strip('\'"?,.:;')
-#         w2 = w2.lower()
-#         tweetB[i][1] = w2
-#         # ignore if stop word
-#         if tweetB[i][0] in stopWords and tweetB[i][1] in stopWords:
-#             continue
-#         else:
-#             bigrams.append(' '.join(tweetB[i]))
-#     #replaceNegationBi(bigrams)
-#     return bigrams
-#
-# def getTrigrams(tweet):
-#     tweetP = processTweet(tweet)
-#     tweetB = ngrams(tweetP, 3)
-#     trigrams = []
-#     for i in range(len(tweetB)):
-#         w = tweetB[i][0]
-#         w = totwo(w)
-#         w = w.strip('\'"?,.')
-#         w = w.lower()
-#         tweetB[i][0] = w
-#
-#         w2 = tweetB[i][1]
-#         w2 = totwo(w2)
-#         w2 = w2.strip('\'"?,.:;')
-#         w2 = w2.lower()
-#         tweetB[i][1] = w2
-#
-#         w3 = tweetB[i][2]
-#         w3 = totwo(w3)
-#         w3 = w3.strip('\'"?,.:;')
-#         w3 = w3.lower()
-#         tweetB[i][2] = w3
-#         # ignore if stop word
-#         if tweetB[i][0] in stopWords and tweetB[i][1] in stopWords:
-#             continue
-#         elif tweetB[i][1] in stopWords and tweetB[i][2] in stopWords:
-#             continue
-#         else:
-#             trigrams.append(' '.join(tweetB[i]))
-#     #replaceNegationBi(bigrams)
-#     return trigrams
-#
-#
-#
-#
-#
-# ####moved
-# def read_data(filename):
-#     f=open(filename,'r')
-#     data=[]
-#     for i in f:
-#         if i:
-#             i=i.split('\t')
-#             tweet=i[1]
-#             token=i[2]
-#             label=i[3].strip('\n')
-#             data.append([tweet,token,label])
-#     return data
-#
-#
-#
-# def make_feature_vector(data,T):
-#     featureList=[]
-#     vector=[]
-#     for i in range(len(data)):
-#         sentiment = data[i][2]
-#         token = data[i][1]
-#         featureVector1 = getBigrams(data[i][0])
-#         featureList.extend(featureVector1)
-#         featureVector2 = getFeatureVector(data[i][0])
-#         featureList.extend(featureVector2)
-#         featureVector3 = getTrigrams(data[i][0])
-#         featureList.extend(featureVector3)
-#         # remember to add +feature vector 3 below
-#         vector.append((featureVector1 + featureVector2 + featureVector3, token, sentiment))
-#     if T ==1:
-#         return (featureList, vector)
-#     else:
-#         return vector
-#
-#
-#
-#
-# def getSVMFeatureVectorAndLabels(tweets, featureList):
-#     sortedFeatures = sorted(featureList)
-#
-#     feature_vector = []
-#     labels = []
-#     for t in tweets:
-#         label = 0
-#         map = {}
-#         # Initialize empty map
-#         for w in sortedFeatures:
-#             map[w] = 0
-#
-#         # print map
-#         tweet_words = t[0]
-#         tweet_token = t[1]
-#         tweet_opinion = t[2]
-#         #Fill the map
-#         # for word in tweet_words:
-#         #     # process the word (remove repetitions and punctuations)
-#         #     # word = replaceTwoOrMore(word)
-#         #     # word = word.strip('\'"?,.')
-#         #     # set map[word] to 1 if word exists
-#         #     if word in map:
-#         #         map[word] = 1
-#         # # end for loop
-#         # values = map.values()
-#
-#         #Get the lexicon values
-#         #print lexiconScores(tweet_words)
-#         values=lexiconScores(tweet_words)
-#         #values.extend(countPOS(tweet_token))
-#
-#         feature_vector.append(values)
-#         #need to add more things here
-#         # if (tweet_opinion == 'neutral'):
-#         #     label = 0
-#         if (tweet_opinion == 'negative'):
-#             label = -1
-#             labels.append(label)
-#         elif (tweet_opinion == 'positive'):
-#             label = 1
-#             labels.append(label)
-#         elif (tweet_opinion == 'neutral'):
-#             label = 0
-#             labels.append(label)
-#
-#     # return the list of feature_vector and labels
-#     return {'feature_vector': feature_vector, 'labels': labels}
-
 # read in testing and training data
 data = read_data("../data/tweets/finalTrainingInput.txt")
 dataT = read_data("../data/tweets/finalTestingInput.txt")
@@ -338,6 +28,13 @@ with open("../data/other/hashtag lexicon/bigrams-pmilexicon.txt",'r') as f:
         el = i.split("\t")
         dictionary2[el[0]] = el[1]
 
+# MPQA dictioinary
+# dictionary3={}
+# with open("../data/other/hashtag lexicon/bigrams-pmilexicon.txt",'r') as f:
+#     for i in f:
+#         el = i.split("\t")
+#         dictionary2[el[0]] = el[1]
+
 featureList, train_tweets= make_feature_vector(data,1)
 test_tweets = make_feature_vector(dataT,0)
 
@@ -351,7 +48,7 @@ result = getSVMFeatureVectorAndLabels(train_tweets, featureList, dictionary, dic
 
 problem = svm_problem(result['labels'], result['feature_vector'])
 # '-q' option suppress console output
-param = svm_parameter('-q -c 100 -b 1')
+param = svm_parameter('-q -c 0.1 -b 1')
 param.kernel_type = LINEAR
 
 print 'begin training'
@@ -364,8 +61,11 @@ print t_labels
 
 print 'begin Testing'
 # Test the classifier
-test_feature_vector = getSVMFeatureVectorAndLabels(test_tweets, featureList, dictionary)
+test_feature_vector = getSVMFeatureVectorAndLabels(test_tweets, featureList, dictionary, dictionary2)
 p_labels, p_accs, p_vals = svm_predict(test_feature_vector['labels'], test_feature_vector['feature_vector'], classifier,'-b 1')
 print p_labels
 
 print datetime.now() - startTime
+
+#previous @0.1 56.586, 50.3221
+

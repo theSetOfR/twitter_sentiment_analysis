@@ -74,7 +74,7 @@ def totwo(s):
     return pattern.sub(r"\1\1", s)
 
 
-"""add negation to tweetss"""
+"""add negation to tweets"""
 
 
 def replaceNegationBi(tweet):
@@ -279,7 +279,9 @@ def make_feature_vector(data, T):
         featureList.extend(featureVector2)
         featureVector3 = getTrigrams(data[i][0], stopWords)
         featureList.extend(featureVector3)
-        n_grams = get_unigrams(data[i][0], stopWords, 0)+getBigrams(data[i][0], stopWords, 0)
+        unigrams = get_unigrams(data[i][0], stopWords, 0)
+        bigrams =getBigrams(data[i][0], stopWords, 0)
+        n_grams = unigrams+bigrams
         # remember to add +feature vector 3 below
         vector.append((featureVector1 + featureVector2 + featureVector3, token, sentiment, n_grams))
     if T == 1:
@@ -309,21 +311,23 @@ def getSVMFeatureVectorAndLabels(tweets, featureList, dictionary1, dictionary2):
         tweet_opinion = t[2]
         tweet_n_grams = t[3]
         # Fill the map
-        # for word in tweet_words:
-        #     # process the word (remove repetitions and punctuations)
-        #     # word = replaceTwoOrMore(word)
-        #     # word = word.strip('\'"?,.')
-        #     # set map[word] to 1 if word exists
-        #     if word in map:
-        #         map[word] = 1
-        # # end for loop
-        # values = map.values()
+        for word in tweet_words:
+            # process the word (remove repetitions and punctuations)
+            # word = replaceTwoOrMore(word)
+            # word = word.strip('\'"?,.')
+            # set map[word] to 1 if word exists
+            if word in map:
+                map[word] = 1
+        # end for loop
+        values = map.values()
 
         # Get the lexicon values
         # print scorelexicon(tweet_words)
-        values = scorelexicon(tweet_words, dictionary1)
-        values.extend(scorelexicon(tweet_words, dictionary2))
-        # values.extend(countPOS(tweet_token))
+        # Dictionary 1 unigrams
+        values.extend(scorelexicon(tweet_words, dictionary1))
+        values.extend(scorelexicon(tweet_n_grams, dictionary2))
+        # Count POS tags
+        values.extend(countPOS(tweet_token))
 
         feature_vector.append(values)
         # need to add more things here
