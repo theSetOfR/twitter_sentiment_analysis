@@ -28,6 +28,12 @@ with open("../data/other/hashtag lexicon/bigrams-pmilexicon.txt",'r') as f:
         el = i.split("\t")
         dictionary2[el[0]] = el[1]
 
+# dictionary3={}
+# with open("../data/other/hashtag lexicon/bigrams-pmilexicon.txt",'r') as f:
+#     for i in f:
+#         el = i.split("\t")
+#         dictionary2[el[0]] = el[1]
+
 featureList, train_tweets= make_feature_vector(data,1)
 test_tweets = make_feature_vector(dataT,0)
 
